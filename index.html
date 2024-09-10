@@ -4,108 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clicker Game</title>
-    <script>
-        // Убедитесь, что этот URL соответствует вашему ngrok URL
-        const SERVER_URL = 'https://5172-167-99-200-146.ngrok-free.app';
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #2c3e50; /* Темный фон */
+            color: #ecf0f1; /* Светлый текст */
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .button {
+            display: inline-block;
+            font-size: 24px;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 5px;
+            background-color: #8e44ad; /* Темно-фиолетовый цвет */
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .button:active {
+            background-color: #732d91; /* Более темный фиолетовый при нажатии */
+        }
+        .score {
+            font-size: 32px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Clicker Game!</h1>
+        <button class="button" id="clickButton">Click Me!</button>
+        <div class="score">
+            Score: <span id="score">0</span>
+        </div>
+    </div>
 
+    <script>
         // Функция для получения параметра user_id из URL
         function getUserIdFromURL() {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('user_id');
         }
 
-        // Функция для отправки прогресса
-        async function sendProgressData(userId, progress) {
+        // Функция для обновления прогресса
+        async function updateProgress(userId, score) {
             if (!userId) {
                 console.error("User ID not provided");
                 return;
             }
 
             try {
-                const response = await fetch(`${SERVER_URL}/register`, {
+                const response = await fetch('http://localhost:8080/update', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ user_id: userId, progress: progress }),
+                    body: JSON.stringify({ user_id: userId, score: score }),
                 });
 
                 const data = await response.json();
                 if (data.status === 'success') {
-                    console.log('Progress sent successfully');
+                    console.log('Progress updated successfully');
                 } else {
-                    console.error('Error sending progress:', data.message);
+                    console.error('Error updating progress:', data.message);
                 }
             } catch (error) {
                 console.error('Error:', error);
             }
         }
 
-        // Пример использования
+        // При загрузке страницы получаем user_id
         window.onload = function() {
             const userId = getUserIdFromURL();
-            const progress = { level: 1, score: 100 }; // Ваши данные прогресса
-            sendProgressData(userId, progress);
-        }
-    </script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
-        }
-        #clickButton {
-            padding: 20px;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        #clickCount {
-            font-size: 24px;
-            margin: 20px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Clicker Game</h1>
-    <button id="clickButton">Click me!</button>
-    <div id="clickCount">Clicks: 0</div>
+            const clickButton = document.getElementById('clickButton');
+            const scoreElement = document.getElementById('score');
+            let score = 0;
 
-    <script>
-        // Получаем user_id из URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('user_id');
-
-        // Загружаем прогресс из localStorage или начинаем с нуля
-        let clickCount = parseInt(localStorage.getItem('clickCount_' + userId)) || 0;
-        document.getElementById('clickCount').innerText = 'Clicks: ' + clickCount;
-
-        // Функция для сохранения прогресса на сервере
-        async function saveProgressToServer(clickCount) {
-            try {
-                const response = await fetch('http://localhost:8080/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userId, clicks: clickCount })
-                });
-
-                const data = await response.json();
-                console.log('Server response:', data);
-            } catch (error) {
-                console.error('Error saving progress:', error);
+            clickButton.onclick = function() {
+                score++;
+                scoreElement.textContent = score;
+                updateProgress(userId, score);
             }
         }
-
-        // Обработка клика
-        document.getElementById('clickButton').addEventListener('click', function () {
-            clickCount++;
-            document.getElementById('clickCount').innerText = 'Clicks: ' + clickCount;
-
-            // Сохраняем прогресс в localStorage
-            localStorage.setItem('clickCount_' + userId, clickCount);
-
-            // Сохраняем прогресс на сервере
-            saveProgressToServer(clickCount);
-        });
     </script>
 </body>
 </html>
