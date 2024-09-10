@@ -2,30 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>Advanced Clicker</title>
     <style>
+        /* Общие стили для страницы */
         body {
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f0f0;
+            background-color: #121212; /* Темный фон */
+            color: white; /* Белый текст */
             margin: 0;
+            overflow: hidden; /* Запретить прокрутку */
         }
         #clicker {
             text-align: center;
-            background: white;
+            background: #1e1e1e; /* Темный цвет для блока кликера */
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
         }
         button {
             padding: 10px 20px;
             font-size: 16px;
             margin-top: 20px;
             cursor: pointer;
+            background-color: #6200ee; /* Кнопка с фиолетовым фоном */
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:active {
+            transform: scale(0.98); /* Эффект при нажатии */
         }
         .score, .upgrade-cost {
             margin-top: 10px;
@@ -79,6 +89,18 @@
                 upgradeBtn.disabled = true;
             }
         }
+
+        // Отключаем двойное нажатие для приближения
+        document.addEventListener('touchstart', function preventZoom(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Отключаем приближение при двойном тапе
+        document.addEventListener('dblclick', function (e) {
+            e.preventDefault();
+        });
 
         // Инициализация WebApp
         Telegram.WebApp.ready();
