@@ -4,27 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clicker Game</title>
-    <script>
-        // Получаем параметр user_id из URL
-        function getUserIdFromURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('user_id');
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
         }
-
-        // При загрузке страницы регистрируем пользователя или перенаправляем
-        window.onload = function() {
-            const userId = getUserIdFromURL();
-            
-            if (userId) {
-                // Если user_id есть, перенаправляем на страницу игры
-                window.location.href = `clicker.html?user_id=${userId}`;
-            } else {
-                console.error('User ID not found in the URL');
-            }
+        #clickButton {
+            padding: 20px;
+            font-size: 24px;
+            cursor: pointer;
         }
-    </script>
+        #clickCount {
+            font-size: 24px;
+            margin: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to the Clicker Game!</h1>
+    <h1>Clicker Game</h1>
+    <button id="clickButton">Click me!</button>
+    <div id="clickCount">Clicks: 0</div>
+
+    <script>
+        // Получаем user_id из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user_id');
+
+        // Загружаем прогресс из localStorage или начинаем с нуля
+        let clickCount = parseInt(localStorage.getItem('clickCount_' + userId)) || 0;
+        document.getElementById('clickCount').innerText = 'Clicks: ' + clickCount;
+
+        // Функция для сохранения прогресса на сервере
+        async function saveProgressToServer(clickCount) {
+            try {
+                const response = await fetch('http://localhost:8080/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, clicks: clickCount })
+                });
+
+                const data = await response.json();
+                console.log('Server response:', data);
+            } catch (error) {
+                console.error('Error saving progress:', error);
+            }
+        }
+
+        // Обработка клика
+        document.getElementById('clickButton').addEventListener('click', function () {
+            clickCount++;
+            document.getElementById('clickCount').innerText = 'Clicks: ' + clickCount;
+
+            // Сохраняем прогресс в localStorage
+            localStorage.setItem('clickCount_' + userId, clickCount);
+
+            // Сохраняем прогресс на сервере
+            saveProgressToServer(clickCount);
+        });
+    </script>
 </body>
 </html>
