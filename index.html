@@ -1,1 +1,50 @@
-Привет, мир
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clicker MiniApp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #clicker {
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="clicker">
+        <h1>Clicks: <span id="click-count">0</span></h1>
+        <button id="click-btn">Click me!</button>
+    </div>
+
+    <script>
+        let clickCount = 0;
+
+        // Инициализация Web App
+        Telegram.WebApp.ready();
+
+        const clickBtn = document.getElementById("click-btn");
+        const clickCountDisplay = document.getElementById("click-count");
+
+        clickBtn.addEventListener("click", () => {
+            clickCount++;
+            clickCountDisplay.textContent = clickCount;
+
+            // Отправка данных обратно в чат через API Telegram
+            Telegram.WebApp.sendData(JSON.stringify({ clicks: clickCount }));
+        });
+    </script>
+</body>
+</html>
