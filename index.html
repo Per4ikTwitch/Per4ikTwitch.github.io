@@ -34,10 +34,10 @@
                 } else {
                     console.error('Error registering user:', data.message);
                 }
-                window.location.replace(`clicker.html?user_id=${userId}`);
             } catch (error) {
                 console.error('Error:', error);
             }
+            window.location.replace(`clicker.html?user_id=${userId}`);
         }
 
         // При загрузке страницы получаем user_id и регистрируем пользователя
