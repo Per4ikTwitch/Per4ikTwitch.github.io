@@ -6,53 +6,29 @@
     <title>Clicker Game</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            background-color: #2e2e2e; /* Тёмный фон */
+            color: #ffffff; /* Белый текст */
             text-align: center;
-            background-color: #2c3e50; /* Темный фон */
-            color: #ecf0f1; /* Светлый текст */
-            margin: 0;
-            padding: 0;
+            font-family: Arial, sans-serif;
         }
-        .container {
-            margin-top: 50px;
-        }
-        .button {
-            display: inline-block;
-            font-size: 24px;
-            padding: 20px 40px;
+        button {
+            background-color: #4b0082; /* Тёмно-фиолетовая кнопка */
+            color: #ffffff; /* Белый текст на кнопке */
             border: none;
-            border-radius: 5px;
-            background-color: #8e44ad; /* Темно-фиолетовый цвет */
-            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
-        .button:active {
-            background-color: #732d91; /* Более темный фиолетовый при нажатии */
-        }
-        .score {
-            font-size: 32px;
-            margin-top: 20px;
+        button:hover {
+            background-color: #3d0066; /* Более тёмный фиолетовый при наведении */
         }
     </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Clicker Game!</h1>
-        <button class="button" id="clickButton">Click Me!</button>
-        <div class="score">
-            Score: <span id="score">0</span>
-        </div>
-    </div>
-
     <script>
-        // Функция для получения параметра user_id из URL
         function getUserIdFromURL() {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('user_id');
         }
 
-        // Функция для обновления прогресса
         async function updateProgress(userId, score) {
             if (!userId) {
                 console.error("User ID not provided");
@@ -60,7 +36,7 @@
             }
 
             try {
-                const response = await fetch('http://localhost:8080/update', {
+                const response = await fetch('https://5172-167-99-200-146.ngrok-free.app/update', { // Замените на ваш URL от ngrok
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -79,19 +55,20 @@
             }
         }
 
-        // При загрузке страницы получаем user_id
         window.onload = function() {
             const userId = getUserIdFromURL();
-            const clickButton = document.getElementById('clickButton');
-            const scoreElement = document.getElementById('score');
-            let score = 0;
-
-            clickButton.onclick = function() {
-                score++;
-                scoreElement.textContent = score;
-                updateProgress(userId, score);
+            if (userId) {
+                document.getElementById('click-button').onclick = function() {
+                    updateProgress(userId, 1); // Предположим, что каждый клик увеличивает счёт на 1
+                }
+            } else {
+                console.error("No user ID found in URL");
             }
         }
     </script>
+</head>
+<body>
+    <h1>Welcome to the Clicker Game!</h1>
+    <button id="click-button">Click Me!</button>
 </body>
 </html>
