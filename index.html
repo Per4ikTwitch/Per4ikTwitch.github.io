@@ -30,6 +30,8 @@
                 const data = await response.json();
                 if (data.status === 'success') {
                     console.log('User registered successfully');
+                    // Перенаправление на страницу clicker.html с сохранением user_id
+                    window.location.replace(`clicker.html?user_id=${userId}`);
                 } else {
                     console.error('Error registering user:', data.message);
                 }
