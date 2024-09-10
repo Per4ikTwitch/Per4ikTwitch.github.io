@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clicker MiniApp</title>
+    <title>Advanced Clicker</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,40 +11,77 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            background-color: #f0f0f0;
             margin: 0;
         }
         #clicker {
             text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         button {
             padding: 10px 20px;
             font-size: 16px;
+            margin-top: 20px;
             cursor: pointer;
+        }
+        .score, .upgrade-cost {
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div id="clicker">
         <h1>Clicks: <span id="click-count">0</span></h1>
+        <h2>Points: <span id="points">0</span></h2>
         <button id="click-btn">Click me!</button>
+        <div class="upgrade-cost">Upgrade cost: <span id="upgrade-cost">10</span> points</div>
+        <button id="upgrade-btn" disabled>Upgrade (x2 points per click)</button>
     </div>
 
     <script>
         let clickCount = 0;
+        let points = 0;
+        let pointsPerClick = 1;
+        let upgradeCost = 10;
 
-        // Инициализация Web App
-        Telegram.WebApp.ready();
-
-        const clickBtn = document.getElementById("click-btn");
         const clickCountDisplay = document.getElementById("click-count");
+        const pointsDisplay = document.getElementById("points");
+        const upgradeCostDisplay = document.getElementById("upgrade-cost");
+        const clickBtn = document.getElementById("click-btn");
+        const upgradeBtn = document.getElementById("upgrade-btn");
 
         clickBtn.addEventListener("click", () => {
             clickCount++;
+            points += pointsPerClick;
             clickCountDisplay.textContent = clickCount;
-
-            // Отправка данных обратно в чат через API Telegram
-            Telegram.WebApp.sendData(JSON.stringify({ clicks: clickCount }));
+            pointsDisplay.textContent = points;
+            checkUpgrade();
         });
+
+        upgradeBtn.addEventListener("click", () => {
+            if (points >= upgradeCost) {
+                points -= upgradeCost;
+                pointsPerClick *= 2;
+                upgradeCost *= 2; // Увеличиваем стоимость улучшения
+                upgradeCostDisplay.textContent = upgradeCost;
+                pointsDisplay.textContent = points;
+                checkUpgrade();
+            }
+        });
+
+        function checkUpgrade() {
+            if (points >= upgradeCost) {
+                upgradeBtn.disabled = false;
+            } else {
+                upgradeBtn.disabled = true;
+            }
+        }
+
+        // Инициализация WebApp
+        Telegram.WebApp.ready();
     </script>
 </body>
 </html>
