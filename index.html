@@ -105,5 +105,32 @@
         // Инициализация WebApp
         Telegram.WebApp.ready();
     </script>
+    <script>
+        async function updateProgress(userId, clicks) {
+            try {
+                const response = await fetch('http://localhost:8080/update_progress', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        clicks: clicks
+                    }),
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    console.log('Progress updated successfully');
+                } else {
+                    console.error('Error updating progress');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+      
+        // Пример использования
+        updateProgress('12345', 10); // Пример вызова функции с userId и количеством кликов
+    </script>      
 </body>
 </html>
