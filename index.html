@@ -2,132 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-    <title>Advanced Clicker</title>
-    <style>
-        /* Общие стили для страницы */
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #121212; /* Темный фон */
-            color: white; /* Белый текст */
-            margin: 0;
-            overflow: hidden; /* Запретить прокрутку */
-        }
-        #clicker {
-            text-align: center;
-            background: #1e1e1e; /* Темный цвет для блока кликера */
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            margin-top: 20px;
-            cursor: pointer;
-            background-color: #6200ee; /* Кнопка с фиолетовым фоном */
-            color: white;
-            border: none;
-            border-radius: 4px;
-        }
-        button:active {
-            transform: scale(0.98); /* Эффект при нажатии */
-        }
-        .score, .upgrade-cost {
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-    <div id="clicker">
-        <h1>Clicks: <span id="click-count">0</span></h1>
-        <h2>Points: <span id="points">0</span></h2>
-        <button id="click-btn">Click me!</button>
-        <div class="upgrade-cost">Upgrade cost: <span id="upgrade-cost">10</span> points</div>
-        <button id="upgrade-btn" disabled>Upgrade (x2 points per click)</button>
-    </div>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clicker Game</title>
     <script>
-        let clickCount = 0;
-        let points = 0;
-        let pointsPerClick = 1;
-        let upgradeCost = 10;
-
-        const clickCountDisplay = document.getElementById("click-count");
-        const pointsDisplay = document.getElementById("points");
-        const upgradeCostDisplay = document.getElementById("upgrade-cost");
-        const clickBtn = document.getElementById("click-btn");
-        const upgradeBtn = document.getElementById("upgrade-btn");
-
-        clickBtn.addEventListener("click", () => {
-            clickCount++;
-            points += pointsPerClick;
-            clickCountDisplay.textContent = clickCount;
-            pointsDisplay.textContent = points;
-            checkUpgrade();
-        });
-
-        upgradeBtn.addEventListener("click", () => {
-            if (points >= upgradeCost) {
-                points -= upgradeCost;
-                pointsPerClick *= 2;
-                upgradeCost *= 2; // Увеличиваем стоимость улучшения
-                upgradeCostDisplay.textContent = upgradeCost;
-                pointsDisplay.textContent = points;
-                checkUpgrade();
-            }
-        });
-
-        function checkUpgrade() {
-            if (points >= upgradeCost) {
-                upgradeBtn.disabled = false;
-            } else {
-                upgradeBtn.disabled = true;
-            }
+        // Функция для получения параметра user_id из URL
+        function getUserIdFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('user_id');
         }
 
-        // Отключаем двойное нажатие для приближения
-        document.addEventListener('touchstart', function preventZoom(e) {
-            if (e.touches.length > 1) {
-                e.preventDefault();
+        // Функция для регистрации пользователя
+        async function registerUser(userId) {
+            if (!userId) {
+                console.error("User ID not provided");
+                return;
             }
-        }, { passive: false });
 
-        // Отключаем приближение при двойном тапе
-        document.addEventListener('dblclick', function (e) {
-            e.preventDefault();
-        });
-
-        // Инициализация WebApp
-        Telegram.WebApp.ready();
-    </script>
-    <script>
-        async function updateProgress(userId, clicks) {
             try {
-                const response = await fetch('https://ee04-209-97-178-111.ngrok-free.app/update_progress', {
+                const response = await fetch('http://localhost:8080/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        user_id: userId,
-                        clicks: clicks
-                    }),
+                    body: JSON.stringify({ user_id: userId }),
                 });
+
                 const data = await response.json();
                 if (data.status === 'success') {
-                    console.log('Progress updated successfully');
+                    console.log('User registered successfully');
                 } else {
-                    console.error('Error updating progress');
+                    console.error('Error registering user:', data.message);
                 }
             } catch (error) {
                 console.error('Error:', error);
             }
         }
-    </script>      
+
+        // При загрузке страницы получаем user_id и регистрируем пользователя
+        window.onload = function() {
+            const userId = getUserIdFromURL();
+            registerUser(userId);
+        }
+    </script>
+</head>
+<body>
+    <h1>Welcome to the Clicker Game!</h1>
 </body>
 </html>
